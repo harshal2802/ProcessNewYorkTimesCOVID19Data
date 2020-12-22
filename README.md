@@ -110,7 +110,7 @@ Running From bash::
 
 ```sh
 #make sure that you are inside project("NewYorkTimesCOVID19DataWithPopulation") directory
-$ python3 mayn.py \
+$ python3 main.py \
   --covid19_csv_path https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv \
   --population_csv_path https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv \
   --output_file_path aggregated_covid19_data_with_population.csv
@@ -148,7 +148,7 @@ Given dataset contains mainly 2 csv file sources
 
    - STATE: string, 2 digit code <br>
    - COUNTY: string, 3 digit code <br>
-   - POPESTIMATE2019:integer, estimated population of 2019 <br>
+   - POPESTIMATE2019:float, estimated population of 2019 <br>
 
 2. [New York Times COVID-19 Data](https://github.com/nytimes/covid-19-data/blob/master/README.md)
    [download](https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv):
@@ -158,8 +158,8 @@ Given dataset contains mainly 2 csv file sources
    - date: string, standard date format <br>
    - county: string, county name <br>
    - state: string, state name <br>
-   - cases: integer, The total number of cases of Covid-19, including both confirmed and probable. <br>
-   - deaths: integer, The total number of deaths from Covid-19, including both confirmed and probable. <br>
+   - cases: float, The total number of cases of Covid-19, including both confirmed and probable. <br>
+   - deaths: float, The total number of deaths from Covid-19, including both confirmed and probable. <br>
 
 <!-- Problem Statement -->
 
@@ -176,11 +176,11 @@ Final Data should have following columns:
 
 - fips: string, 5 digit code <br>
 - date: string, standard date format <br>
-- population: integer, updated population estimate <br>
-- daily_cases: integer, daily covid-19 cases <br>
-- daily_deaths: integer, daily covid-19 deaths <br>
-- cumulative_cases_to_date: integer, cumulative cases to date <br>
-- cumulative_deaths_to_date: integer, cumulative deaths to date <br>
+- population: float, updated population estimate <br>
+- daily_cases: float, daily covid-19 cases <br>
+- daily_deaths: float, daily covid-19 deaths <br>
+- cumulative_cases_to_date: float, cumulative cases to date <br>
+- cumulative_deaths_to_date: float, cumulative deaths to date <br>
 
 <!-- Functions and Assumptions -->
 
@@ -198,7 +198,7 @@ Following operations are executed as a part of this function:
 - Select only required columns: "fips", "date", "cases", "deaths"
 - Drop records with null values: Drop records with null values in
   "fips", "date", "cases", "deaths" columns
-- Typecast to integer: cases and deaths to integer
+- Typecast to float: cases and deaths to float
 - Typecast date to datetime64[ns]
 
 Explanation:
@@ -219,7 +219,7 @@ Explanation:
    - deaths: Remove all the records which do not have any/NaN values
      in deaths field. <br>
 2. typecast_columns: Function to typecast "date" as datetime,
-   "cases" as integer and "deaths" as integer<br>
+   "cases" as float and "deaths" as float<br>
 
 <!-- preprocess_population_df -->
 
@@ -230,7 +230,7 @@ the raw data.
 Following operations are executed as a part of this function:
 
 - generate fips code: combine "STATE" and "COUNTY" columns to generate fips code
-- typecast POPESTIMATE2019: typecast "POPESTIMATE2019" as integer
+- typecast POPESTIMATE2019: typecast "POPESTIMATE2019" as float
 
 <!-- combine_data -->
 
@@ -247,9 +247,9 @@ The output will have following attributes:
 
 - fips: string, 5 digit code
 - date: datetime64[ns], standard date format
-- cases: integer, The total number of cases of Covid-19, including both confirmed and probable.
-- deaths: integer, The total number of deaths related to Covid-19, including both confirmed and probable.
-- POPESTIMATE2019: integer, estimated population of 2019. Null values corrosponding to this attribute implies that related fips code is not available in population estimate data.
+- cases: float, The total number of cases of Covid-19, including both confirmed and probable.
+- deaths: float, The total number of deaths related to Covid-19, including both confirmed and probable.
+- POPESTIMATE2019: float, estimated population of 2019. Null values corrosponding to this attribute implies that related fips code is not available in population estimate data.
 
 <!-- calculate_stats_by_county -->
 
@@ -291,11 +291,11 @@ Final dataframe looks like:
 
 - fips: string
 - date: datetime64[ns]
-- population:integer
-- daily_cases:integer
-- daily_deaths:integer
-- cumulative_cases_to_date:integer
-- cumulative_deaths_to_date:integer
+- population:float
+- daily_cases:float
+- daily_deaths:float
+- cumulative_cases_to_date:float
+- cumulative_deaths_to_date:float
 
 <!-- Learnings or thoughts on data source -->
 
