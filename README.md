@@ -1,4 +1,4 @@
-# NewYorkTimesCOVID19DataWithPopulation
+# ProcessNewYorkTimesCOVID19Data
 
 <!-- TABLE OF CONTENTS -->
 
@@ -65,13 +65,13 @@ Installing for bash:
 1. Clone this repo
 
 ```sh
-$ git clone https://github.com/harshal2802/NewYorkTimesCOVID19DataWithPopulation.git
+$ git clone https://github.com/harshal2802/ProcessNewYorkTimesCOVID19Data.git
 ```
 
 2. Change directory to above cloned repo
 
 ```sh
-$ cd NewYorkTimesCOVID19DataWithPopulation
+$ cd ProcessNewYorkTimesCOVID19Data
 ```
 
 3. Install dependencies from requirements.txt
@@ -85,13 +85,13 @@ Installing for Docker:
 1. Clone this repo
 
 ```sh
-git clone https://github.com/harshal2802/NewYorkTimesCOVID19DataWithPopulation.git
+git clone https://github.com/harshal2802/ProcessNewYorkTimesCOVID19Data.git
 ```
 
 2. Change directory to above cloned repo
 
 ```sh
-cd NewYorkTimesCOVID19DataWithPopulation
+cd ProcessNewYorkTimesCOVID19Data
 ```
 
 3. Build docker container:
@@ -109,7 +109,7 @@ To generate summary data file for given Chicago bird collision dataset please us
 Running From bash::
 
 ```sh
-#make sure that you are inside project("NewYorkTimesCOVID19DataWithPopulation") directory
+#make sure that you are inside project("ProcessNewYorkTimesCOVID19Data") directory
 $ python3 main.py \
   --covid19_csv_path https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv \
   --population_csv_path https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv \
@@ -119,7 +119,7 @@ $ python3 main.py \
 Running From Docker::
 
 ```sh
-#make sure that you are inside project("NewYorkTimesCOVID19DataWithPopulation") directory
+#make sure that you are inside project("ProcessNewYorkTimesCOVID19Data") directory
 $ docker run -p 8080:8080 -v $PWD:/shared covid19_data_with_population \
   main.py \
   --covid19_csv_path https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv \
@@ -218,8 +218,6 @@ Explanation:
      in cases field.
    - deaths: Remove all the records which do not have any/NaN values
      in deaths field. <br>
-2. typecast_columns: Function to typecast "date" as datetime,
-   "cases" as float and "deaths" as float<br>
 
 <!-- preprocess_population_df -->
 
@@ -323,6 +321,15 @@ Here are few observations about New York Times COVID-19 Data:
   For the time being we will report these value of population as Null.
   We can improve this data by obtaining the population of these missing fips code from
   official sources.
+- Date columns are not continous for following fips code:
+  - "16033", ( Clark, Idaho ): 7 days of data missing before 2020-07-28
+  - "16061", ( Lewis, Idaho ): 35 days of data missing before 2020-08-12
+  - "31057", ( Dundy, Nebraska ): 5 days of data missing before 2020-07-28
+  - "31103", ( Keya Paha, Nebraska ): 8 days of data missing before 2020-08-26
+  - "31165", ( Sioux, Nebraska ): 2 days of data missing before 2020-08-19
+  - "31183", ( Wheeler, Nebraska ): 10 days of data missing before 2020-08-09
+  - "38047", ( Logan, North Dakota ): 4 days of data missing before 2020-07-12
+  - "40129", ( Roger Mills, Oklahoma ): 5 days of data missing before 2020-07-17
 
 <!-- Testing the output -->
 
@@ -333,11 +340,12 @@ check the "sanity_check_prepared_data" function in NewYorkTimesCovid19Data class
 
 - Check all the expected columns are available in the dataframe
 - Check if all the fips available in final dataframe as compare to original data.
-- Check for all the fips value the data is available except for the counties
+- Check for all the fips values, the data is available except for the counties
   for which population data is missing, (69110', '69120', '78010', '78020', '78030')
-- Check for all "fips" value the date column should be increasing order with
-  the cumulative values(cumulative_cases_to_date, cumulative_deaths_to_date)
-  are also in non-decreasing order
+- Check for all "fips" value with sorted date column, values cumulative_cases_to_date, and
+  cumulative_deaths_to_date of should be in non decreasing order.
+- For a given fips value date value should be continous and no date value should be missing
+  between min(date) and max(date) value
 
 <!-- Things I would add given more time -->
 
@@ -349,6 +357,8 @@ by:
 - implementing the logic to include Geographic exceptions for the New York Times
   COVID-19 Data
 - getting the population data for the counties for which population is missing
+- Define how to handle records for a missing date for a given fips code as mentioned
+  in last point of learning section.
 
 <!-- LICENSE -->
 
@@ -362,7 +372,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Harshal Chourasiya - [Linkedin](https://www.linkedin.com/in/harshal-chourasiya-39bb0426/), [Github](https://github.com/harshal2802)
 
-[Project Link](https://github.com/harshal2802/NewYorkTimesCOVID19DataWithPopulation)
+[Project Link](https://github.com/harshal2802/ProcessNewYorkTimesCOVID19Data)
 
 <!-- ACKNOWLEDGEMENTS -->
 
