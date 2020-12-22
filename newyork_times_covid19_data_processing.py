@@ -1,47 +1,6 @@
 import argparse
 import pandas as pd
 
-# --------------------- Get Command line arguments---------------------
-
-
-def get_command_line_args():
-    """
-    Function to read command line arguments
-
-    Returns:
-    -------
-    args: object with following arguments
-        - covid19_csv_path: string, URL/Path for latest data from
-                            New York Times COVID-19 Data
-        - population_csv_path: string, URL/Path for 2019
-                                Population Estimate Data
-        - output_file_path: string, Path of output csv file
-    """
-    parser = argparse.ArgumentParser(
-        description="""Prepare Covid19 cases summary with population
-                        for New York Times COVID-19 Data""")
-
-    parser.add_argument(
-        '--covid19_csv_path',
-        type=str,
-        default="https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv",
-        help="URL/Path for latest data from New York Times COVID-19 Data")
-
-    parser.add_argument(
-        '--population_csv_path',
-        type=str,
-        default="https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/co-est2019-alldata.csv",
-        help="URL/Path for 2019 Population Estimate Data")
-
-    parser.add_argument(
-        '--output_file_path',
-        type=str,
-        default="./aggregated_covid19_data_with_population.csv",
-        help="Path of output csv file")
-
-    args = parser.parse_args()
-    return args
-
 # ----------------------Clean Data-------------------------------------
 
 
@@ -52,7 +11,7 @@ def preprocess_covid19_df(df_covid: pd.DataFrame) -> pd.DataFrame:
     Explanation:
         Drop records with null values: Drop records with null values in
             "fips", "date", "cases", "deaths" columns
-        Typecast to integer: cases and deaths to integer
+        Typecast to float: cases and deaths to float
         Typecast date to datetime64[ns]
 
     Parameters:
@@ -73,8 +32,8 @@ def preprocess_covid19_df(df_covid: pd.DataFrame) -> pd.DataFrame:
         Data having columns:
             fips: string
             date: datetime64[ns]
-            cases: integer
-            deaths: integer
+            cases: float
+            deaths: float
     """
     feature_list = ["fips", "date", "cases", "deaths"]
 
@@ -83,8 +42,8 @@ def preprocess_covid19_df(df_covid: pd.DataFrame) -> pd.DataFrame:
 
     df_covid = df_covid.dropna(subset=feature_list)
 
-    df_covid = df_covid.astype(dtype={"cases": int,
-                                      "deaths": int,
+    df_covid = df_covid.astype(dtype={"cases": float,
+                                      "deaths": float,
                                       "date": "datetime64[ns]"})
     return df_covid
 
@@ -97,7 +56,7 @@ def preprocess_population_df(df_population: pd.DataFrame) \
     Explanation:
         generate fips code: combine "STATE" and "COUNTY" columns
             to generate fips code
-        typecast POPESTIMATE2019: typecast "POPESTIMATE2019" as integer
+        typecast POPESTIMATE2019: typecast "POPESTIMATE2019" as float
 
     Parameters:
     ----------
@@ -111,7 +70,7 @@ def preprocess_population_df(df_population: pd.DataFrame) \
     -------
     df_population: pd.DataFrame object having Population Estimate Data 2019
     with columns:
-            "POPESTIMATE2019":integer
+            "POPESTIMATE2019":float
             "fips":string
     """
     # columns to keep
@@ -121,7 +80,7 @@ def preprocess_population_df(df_population: pd.DataFrame) \
     df_population["fips"] = df_population["STATE"].str.strip() \
         + df_population["COUNTY"].str.strip()
 
-    df_population = df_population.astype(dtype={"POPESTIMATE2019": "int"})
+    df_population = df_population.astype(dtype={"POPESTIMATE2019": float})
 
     return df_population[feature_list]
 
@@ -144,22 +103,22 @@ def combine_data(df_covid: pd.DataFrame, df_population: pd.DataFrame)\
         COVID-19 Data having columns:
             "fips": string
             "date": datetime64[ns]
-            "cases": integer
-            "deaths": integer
+            "cases": float
+            "deaths": float
 
     df_population: pd.DataFrame object with Population Estimate
         Data 2019 having columns:
             "fips": string
-            "POPESTIMATE2019": integer
+            "POPESTIMATE2019": float
     Returns:
     -------
     df_combined: pd.DataFrame object with combined data having
         columns:
             "fips": string
             "date": datetime64[ns]
-            "cases": integer
-            "deaths": integer
-            "POPESTIMATE2019": integer
+            "cases": float
+            "deaths": float
+            "POPESTIMATE2019": float
     """
     #
     df_combined = df_covid.merge(df_population, on="fips", how="left")
@@ -191,19 +150,19 @@ def calculate_stats_by_county(df_county: pd.DataFrame) -> pd.DataFrame:
     df: pd.DataFrame object with data filtered by fips code from
         combined dataframe having following columns:
             "date": datetime64[ns]
-            "cases": integer
-            "deaths": integer
-            "POPESTIMATE2019": integer
+            "cases": float
+            "deaths": float
+            "POPESTIMATE2019": float
     Returns:
     ----------
     df: pd.DataFrame object with generated stats on the data filtered
         by fips code from combined dataframe having following columns:
             "date": datetime64[ns]
-            "population":integer
-            "daily_cases":integer
-            "daily_deaths":integer
-            "cumulative_cases_to_date":integer
-            "cumulative_deaths_to_date":integer
+            "population":float
+            "daily_cases":float
+            "daily_deaths":float
+            "cumulative_cases_to_date":float
+            "cumulative_deaths_to_date":float
     """
     df_county = df_county.sort_values(by="date")
     df_county.index = df_county.date
@@ -250,9 +209,9 @@ def calculate_stats(df_combined: pd.DataFrame) -> pd.DataFrame:
         columns:
             "fips": string
             "date": datetime64[ns]
-            "cases": integer
-            "deaths": integer
-            "POPESTIMATE2019": integer
+            "cases": float
+            "deaths": float
+            "POPESTIMATE2019": float
 
     Returns:
     -------
@@ -260,11 +219,11 @@ def calculate_stats(df_combined: pd.DataFrame) -> pd.DataFrame:
         dataframe having following columns:
             "fips": string
             "date": datetime64[ns]
-            "population":integer
-            "daily_cases":integer
-            "daily_deaths":integer
-            "cumulative_cases_to_date":integer
-            "cumulative_deaths_to_date":integer
+            "population":float
+            "daily_cases":float
+            "daily_deaths":float
+            "cumulative_cases_to_date":float
+            "cumulative_deaths_to_date":float
     """
 
     df = df_combined.groupby("fips")\
